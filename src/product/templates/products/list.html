@@ -12,12 +12,35 @@
 <div class="card">
     <form action="" method="get" class="card-header">
         <div class="form-row justify-content-between">
+            
             <div class="col-md-2">
-                <input type="text" name="title" placeholder="Product Title" class="form-control">
+                <input type="text" name="title_filter" value="{{title_filter}}"placeholder="Product Title" class="form-control">
             </div>
             <div class="col-md-2">
-                <select name="variant" id="" class="form-control">
-                    <option selected disabled>--Select A Variant--</option>
+                <select name="variant_filter" value="{{variant_filter}}" id="" class="form-control">
+                    
+                       <option  selected disabled> </option> 
+                    
+                    {% for type in variants %}
+                    <option selected disabled class="font-weight-bold text-muted" style="color: grey;"> {{type.title}}</option>
+
+                    {% for variant in product_variant_distinct %}
+                    
+                    {% if type.id == variant.variant %}
+                    
+                    <option value="{{variant.variant_title}}"> {{variant.variant_title}}  </option> 
+
+                    {% endif %}
+                        
+                    
+                        
+                    {% endfor %}
+                                                    
+                    {% endfor %}
+                    
+                    
+                 
+                        
 
                 </select>
             </div>
@@ -33,7 +56,7 @@
                 </div>
             </div>
             <div class="col-md-2">
-                <input type="date" name="date" placeholder="Date" class="form-control">
+                <input type="date" name="date_filter" value='date_filter' placeholder="Date" class="form-control">
             </div>
             <div class="col-md-1">
                 <button type="submit" class="btn btn-primary float-right"><i class="fa fa-search"></i></button>
@@ -56,21 +79,50 @@
 
                 <tbody>
                 <tr>
-                    <td>1</td>
-                    <td>T-Shirt <br> Created at : 25-Aug-2020</td>
-                    <td>Quality product in low cost</td>
-                    <td>
+                    
+                    {% for product in products  %}
+                        
+                        
+                    <td>{{product.id}}</td>
+                    <td >{{product.title}} <br> 
+                        Created at : {{product.created_at}}
+                    </td>
+                    <td> 
+                        {{product.description }}
+                    </td>
+                    
+                    <td style="width:30%">
+                        
                         <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
-
+                            {% for pvp in product_variant_price %}
+                            {% if pvp.product_id == product.id%}
                             <dt class="col-sm-3 pb-0">
-                                SM/ Red/ V-Nick
+                                  
+                                {{pvp.product_variant_one.variant_title}}/
+                                {{pvp.product_variant_two.variant_title}}/
+                                {{pvp.product_variant_three.variant_title}} 
+
+
+
                             </dt>
                             <dd class="col-sm-9">
+                              
+                                
                                 <dl class="row mb-0">
-                                    <dt class="col-sm-4 pb-0">Price : 200.0</dt>
-                                    <dd class="col-sm-8 pb-0">InStock : 50.</dd>
+                                    <dt class="col-sm-4 pb-0">
+                                    Price : {{pvp.price}}
+                                 <br>
+                               
+
+                                    </dt>
+                                   
+                                    <dd class="col-sm-8 pb-0">InStock : {{pvp.stock}}</dd>
                                 </dl>
+
+                                  
                             </dd>
+                            {% endif %}                  
+                            {% endfor %}
                         </dl>
                         <button onclick="$('#variant').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more
                         </button>
@@ -81,7 +133,10 @@
                         </div>
                     </td>
                 </tr>
+                {% endfor %}
+
                 </tbody>
+
 
             </table>
         </div>
@@ -91,11 +146,41 @@
     <div class="card-footer">
         <div class="row justify-content-between">
             <div class="col-md-6">
-                <p>Showing 1 to 10 out of 100</p>
+                {% if is_paginated %}
+
+                <p>
+                    Showing {{page_obj.start_index}}
+                    to {{page_obj.end_index}} out of  {{paginator.count}}
+
+                </p>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
+                <ul class="pagination">
+
+                  {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                  {% else %}
+                    <li class="disabled"><span>&laquo;</span></li>
+                  {% endif %}
+
+                  {% for i in paginator.page_range %}
+                    {% if page_obj.number == i %}
+                      <li class="active page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                    {% else %}
+                      <li><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                  {% endfor %}
+                  
+                  {% if page_obj.has_next %}
+                    <li><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                  {% else %}
+                    <li class="disabled"><span>&raquo;</span></li>
+                  {% endif %}
+                </ul>
+              {% endif %}
 
             </div>
+          
         </div>
     </div>
 </div>
